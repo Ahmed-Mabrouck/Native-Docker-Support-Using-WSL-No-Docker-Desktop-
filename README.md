@@ -165,7 +165,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 ## ⭐ Bonus Part: Run Your WSL Machine on Your Windows Startup (Log On) to Match Native Experience
 
-### You Can Run the PowerShell Script in That Repo Called: 📁 WSL-Delayed-Startup-with-KeepAlive.ps1 that can dow the following:
+### You Can Run the PowerShell Script in That Repo Called: 📁 WSL-Delayed-Startup-with-KeepAlive.ps1 that can achieve the following:
 
 1. Runs WSL instance on user logon event with a delay (configurable delay can be updated from the file) to eliminate effect on your Windows machine booting performance.
 2. It runs an inifite wait process to pin WSL process running until you shut it down manually.
