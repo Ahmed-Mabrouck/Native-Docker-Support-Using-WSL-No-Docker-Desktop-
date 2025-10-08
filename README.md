@@ -161,7 +161,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ....
 ````
 
-## 🔥 Congratulations, Now You Are Able to Use Docker Nateively in Your Windows Machine without Docker Desktop.
+## 🔥 Congratulations, Now You Are Able to Use Docker Natively in Your Windows Machine without Docker Desktop.
 
 ## ⭐ Bonus Part: Run Your WSL Machine on Your Windows Startup (Log On) to Match Native Experience
 
