@@ -87,35 +87,32 @@ For more details follow this official tutorial: 🔗 [Post-installation steps | 
 
 ## Configure Docker Host to Be Exposed for Remote Connections
 
-### Creat a New Docker Context that Exposes Host for Remote Access
+### Update Docker Daemon to Listen on TCP 2375
+
+#### Run this Bash Command to Update Docker systemd Service
 
 ````bash
-docker context create wsl --docker host=tcp://127.0.0.1:2375 --description "WSL exposed host context"
+sudo systemctl edit docker.service
 ````
 
-### Configure Docker to Use wsl Context
+#### Add the Following Block to the docker.service File then Save It to 
+
+````
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375
+````
+
+### Restart Docker Daemon and systemd Service 
+
+#### Run this Bash Command to Reload Docker Daemon and Restart systemd Service
 
 ````bash
-docker context use wsl
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
 ````
 
-### Make Sure The Context Successfully Selected
-
-#### Run the Following Bash Command
-
-````bash
-docker context ls
-````
-
-#### Make Sure that the Output Is as Follows (an (*) at wsl which means it is currently selected)
-
-````bash
-NAME      DESCRIPTION                               DOCKER ENDPOINT               ERROR
-default   Current DOCKER_HOST based configuration   unix:///var/run/docker.sock
-wsl *     WSL exposed host context                  tcp://127.0.0.1:2375
-````
-
-For more details follow this official tutorial: 🔗 [Docker contexts | Docker Docs](https://docs.docker.com/engine/manage-resources/contexts/)
+:exclamation: You can make sure that the service is up and running by running `sudo systemctl status docker.service` and make sure there is no error in the log.
 
 ## Configure Windows Host Machine to Connect Remotely to WSL Docker Host
 
@@ -139,31 +136,84 @@ http://localhost:2375/version
 
 ### Extract the Downloaded Archive to any Desired Path and Add this Path to Your PATH Environment Variable on Your Windows Host Machine
 
-### Add DOCKER_HOST from Your Docker WSL Context to Windows Machine Environment Variables
+### Create a New Docker Context to Connect to WSL Docker through TCP
 
-According to your network confiruations on your Windows host machine, choose one of these values for DOCKER_HOST environment variable:
-
-- [x] tcp://localhost:2375 (Mostly that will work)
+````bash
+docker context create wsl --docker host={WSL_DOCKER_HOST} --description "WSL remote context"
+````
+Replace `{WSL_DOCKER_HOST}` with one of the following options (only one of them will work according to network configurations):
+- [x] tcp://localhost:2375 
 - [x] tcp://[::1]:2375
+      
+### Configure Docker to Use wsl Context
 
-### For Each Value of the Above for DOCKER_HOST, Test the Connectivity by Executing the Following CMD/PowerShell Command a New Terminal Window
+````bash
+docker context use wsl
+````
+
+### Make Sure The Context Successfully Selected
+
+#### Run the Following Bash Command
+
+````bash
+docker context ls
+````
+
+#### Make Sure that the Output Is as Follows (an (*) at wsl which means it is currently selected)
+
+````bash
+NAME      DESCRIPTION                               DOCKER ENDPOINT                  ERROR
+default   Current DOCKER_HOST based configuration   npipe:////./pipe/docker_engine
+wsl *     WSL context                               tcp://localhost:2375
+````
+
+### Test Connectivity to Remote WSL Docker Endpoint
+
+#### Execute the Following CMD/PowerShell Command a New Terminal Window
 
 ````powershell
 docker ps
 ````
 
-❗If both did not work, make sure that your WSL and Docker service are running and healthy.
-
-### Youe Should Receive the Following Response (Containers list info varies, no errors with heads as follows is O.K)
+#### The Output Should Be as Follows (Containers list info varies, no errors with heads as follows is O.K)
 
 ````powershell
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
-....
 ````
 
-## 🔥 Congratulations, Now You Are Able to Use Docker Natively in Your Windows Machine without Docker Desktop.
+:exclamation: If one WSL host did not work you have to revert back to default context, remove wsl context and repeat the context creation steps using the other one.
 
-## ⭐ Bonus Part: Run Your WSL Machine on Your Windows Startup (Log On) to Match Native Experience
+:exclamation: If both WSL hosts did not work, make sure that your WSL and Docker service are running and healthy.
+
+For more details follow this official tutorial: 🔗 [Docker contexts | Docker Docs](https://docs.docker.com/engine/manage-resources/contexts/)
+
+## Optional: Add Docker Compose Support on Your Windows Machine
+
+### Download Docker Compose V2 Plugin Your Windows Host Machine (Chooe Your Desired Version)
+
+🔗 [Releases · docker/compose · GitHub](https://github.com/docker/compose/releases)
+
+### Execute the Following Command to Create Docker Compose Plugin Default Directory
+
+````powershell
+mkdir $env:USERPROFILE\.docker\cli-plugins -Force
+````
+### Put the Downloaded Executable to the Created Directory then Rename it to be docker-compose.exe
+
+### Make Sure Docker Compose Successfull Installation
+#### Execute the Following Command in a New Terminal Window
+````powershell
+docker compose version
+````
+#### Make Sure The Output Is as Follows (Version number varies, you should receive the downloaded version with no errors)
+
+````powershell
+Docker Compose version v2.40.3
+````
+
+### 🔥 Congratulations; Now You Can Use Docker Natively in Your Windows Machine without Docker Desktop
+
+## ⭐ Bonus Part: Run Your WSL Machine on Your Windows Startup to Match Native Experience
 
 ### You Can Run the PowerShell Script in That Repo Called: 📁 WSL-Delayed-Startup-with-KeepAlive.ps1 that can achieve the following:
 
